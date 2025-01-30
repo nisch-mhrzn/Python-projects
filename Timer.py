@@ -43,9 +43,9 @@ class CountdownTimer:
         self.minute_entry.bind("<FocusIn>", lambda event: self.clear_entry(self.minute_entry))
         self.second_entry.bind("<FocusIn>", lambda event: self.clear_entry(self.second_entry))
 
-        # Start Button
+        # Start Button (Adjusted position)
         self.start_button = ttk.Button(self.window, text='Start Timer', command=self.start_timer, style="TButton")
-        self.start_button.pack(pady=50)
+        self.start_button.pack(pady=80)
 
         # Styling
         self.style = ttk.Style()

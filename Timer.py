@@ -1,122 +1,94 @@
 from plyer import notification
-from tkinter import messagebox
-from tkinter import *
+from tkinter import messagebox, Tk, Label, Entry, Button, IntVar
+from tkinter import ttk
 import time
 
-# Assign class and set dimensions of the interface
-window = Tk()
-window.geometry("300x200")
-window.title("Python Countdown timer and notification")
-# Remove the placeholders for every entry field based on click
-def h_click(event):
-    hour_entry.delete(0, "end")
+class CountdownTimer:
+    def __init__(self, window):
+        self.window = window
+        self.window.geometry("400x300")
+        self.window.title("Countdown Timer")
+        self.window.configure(bg="#2C3E50")
 
+        # Variables to store the timer values
+        self.hours = IntVar()
+        self.minutes = IntVar()
+        self.seconds = IntVar()
 
-def m_click(event):
-    min_entry.delete(0, "end")
+        # UI Setup
+        self.create_widgets()
 
+    def create_widgets(self):
+        # Title Label
+        Label(self.window, text="Countdown Timer", font=("Arial", 16, "bold"), bg="#2C3E50", fg="white").pack(pady=10)
+        Label(self.window, text="Enter hours, minutes, and seconds", font=("Arial", 10), bg="#2C3E50", fg="#BDC3C7").pack()
 
-def s_click(event):
-    sec_entry.delete(0, "end")
+        # Time Entry Fields
+        self.hour_entry = ttk.Entry(self.window, width=5, textvariable=self.hours, font=("Arial", 14))
+        self.minute_entry = ttk.Entry(self.window, width=5, textvariable=self.minutes, font=("Arial", 14))
+        self.second_entry = ttk.Entry(self.window, width=5, textvariable=self.seconds, font=("Arial", 14))
+        
+        # Default values
+        self.hour_entry.insert(0, "00")
+        self.minute_entry.insert(0, "00")
+        self.second_entry.insert(0, "00")
+        
+        # Positioning entry fields
+        self.hour_entry.place(x=110, y=80)
+        self.minute_entry.place(x=170, y=80)
+        self.second_entry.place(x=230, y=80)
 
+        # Bind click events to clear placeholders
+        self.hour_entry.bind("<FocusIn>", lambda event: self.clear_entry(self.hour_entry))
+        self.minute_entry.bind("<FocusIn>", lambda event: self.clear_entry(self.minute_entry))
+        self.second_entry.bind("<FocusIn>", lambda event: self.clear_entry(self.second_entry))
 
-# Create entry fields for hours, minutes, and seconds
-hour_entry = Entry(window)
-hour_entry.insert(0, "Hours")
-hour_entry.bind("<FocusIn>", h_click)
-hour_entry.pack()
+        # Start Button
+        self.start_button = ttk.Button(self.window, text='Start Timer', command=self.start_timer, style="TButton")
+        self.start_button.pack(pady=50)
 
-min_entry = Entry(window)
-min_entry.insert(0, "Minutes")
-min_entry.bind("<FocusIn>", m_click)
-min_entry.pack()
+        # Styling
+        self.style = ttk.Style()
+        self.style.configure("TButton", font=("Arial", 12, "bold"), padding=6, background="#E74C3C", foreground="white")
 
-sec_entry = Entry(window)
-sec_entry.insert(0, "Seconds")
-sec_entry.bind("<FocusIn>", s_click)
-sec_entry.pack()
+    def clear_entry(self, entry):
+        """Clear the placeholder text when the entry is clicked."""
+        if entry.get() in ["00", "Hours", "Minutes", "Seconds"]:
+            entry.delete(0, "end")
 
-    # Function to activate python countdown timer and show notifications once timer is up
+    def start_timer(self):
+        """Start the countdown timer."""
+        try:
+            total_time = self.hours.get() * 3600 + self.minutes.get() * 60 + self.seconds.get()
 
+            if total_time <= 0:
+                messagebox.showerror(message="Please enter a valid time greater than 0.")
+                return
 
-def timer():
-    # Since we use placeholders, we check if the user entered an integer
-    try:
-        timer_time = (
-            int(hour_entry.get()) * 3600
-            + int(min_entry.get()) * 60
-            + int(sec_entry.get())
-        )
+            while total_time >= 0:
+                hours, remainder = divmod(total_time, 3600)
+                minutes, seconds = divmod(remainder, 60)
 
-    except:
-        messagebox.showerror(message="Enter Valid Time")
-    # The user cannot activate a timer with no time set
-    # To update the timer with every decreasing second and display a notification
-    if timer_time > 0:
-        hour = 0
-        min = 0
-        sec = 0
-        # If minutes is more than 60, it has to be set to the next hour
-        while timer_time >= 0:
-            min, sec = divmod(timer_time, 60)
-            if min > 60:
-                hour, min = divmod(min, 60)
-            # Set the declared variables with the new values to display
-            hours.set(hour)
-            mins.set(min)
-            secs.set(sec)
-            # Sleep for 1 creates a delay of 1 second
-            time.sleep(1)
-            # Update the changes on the window for every second
-            window.update()
-            # Decrement the timer value by 1
-            timer_time -= 1
-        # Create a desktop notification
-        notification.notify(
-            # Title of the notification,
-            title="TIMER ALERT",
-            # Body of the notification
-            message="Hey amigo!\nDid you do what you wanted to achieve? \nIf not, try again with a new timer",
-            app_icon="noti.ico",
-            # Notification stays for 30 seconds
-            timeout=30,
-        )
-        # This notification is provided by tkinter with the created app
-        messagebox.showinfo(message="Timer Complete!")
-#Label for displaying the title of the app
-#position of the label or widget is set using pack().
-#pack defaults to centered alignment on a x row and y column coordinate
-title_label_1=Label(window,text="Countdown timer with notification", font=("Gayathri", 12)).pack()
-title_label_2 = Label(window, text="Put 0 in fields not of use", font=("Gayathri", 10)).pack()
-#Variables using which the timer is updated in the function
-hours = IntVar()
-mins = IntVar()
-secs = IntVar()
- 
-#To read user input for hours, minutes and seconds
-hour_entry=Entry(window,width=3,textvariable=hours,font=("Ubuntu Mono",18))
-min_entry=Entry(window,width=3,textvariable=mins,font=("Ubuntu Mono",18))
-sec_entry=Entry(window,width=3,textvariable=secs,font=("Ubuntu Mono",18))
- 
-#Placeholder for the entry widgets
-hour_entry.insert(0,00)
-min_entry.insert(0,00)
-sec_entry.insert(0,00)
- 
-#Positioning the entry widgets.
-#place() takes an x(from the left) and y(from the top) coordinate
-hour_entry.place(x=80,y=40)
-min_entry.place(x=130,y=40)
-sec_entry.place(x=180,y=40)
- 
-#To link the defined placeholder removal functions on mouse click
-hour_entry.bind("<1>", h_click)
-min_entry.bind("<1>", m_click)
-sec_entry.bind("<1>", s_click)
+                self.hours.set(hours)
+                self.minutes.set(minutes)
+                self.seconds.set(seconds)
 
- 
+                self.window.update()
+                time.sleep(1)
+                total_time -= 1
 
-#button to activate the timer function
-button = Button(window,text='Activate Timer',bg='Red', command=timer).pack(pady=40)
-#Close the window and exit the app
-window.mainloop()
+            # Notify when timer is complete
+            notification.notify(
+                title="TIMER ALERT",
+                message="Hey amigo!\nDid you do what you wanted to achieve? \nIf not, try again with a new timer!",
+                timeout=30
+            )
+            messagebox.showinfo(message="Timer Complete!")
+
+        except ValueError:
+            messagebox.showerror(message="Please enter valid numbers in all fields.")
+
+if __name__ == "__main__":
+    root = Tk()
+    app = CountdownTimer(root)
+    root.mainloop()
